@@ -39,7 +39,7 @@ conoce(frieren, hazania(rescatarHermanaWirbel, [stark, fern], klares), 1390, pre
 conoce(lawine, hazania(destruirAura, [frieren], weise), 1393, cancion).
 conoce(voll, hazania(destruirAura, [denken], auberst), 1400, libro(50)).
 conoce(serie, hazania(destruirReyDemonio, [frieren, himmel, heiter, eisen], ende), 1335, libro(100)).
-conoce(kanne, hazania(recuperarGato, [himmel, frieren], eisen), 1375, presencio).
+conoce(kanne, hazania(recuperarGato, [himmel, frieren], weise), 1375, presencio).
 
 duracionRecuerdo(cancion, 15).
 duracionRecuerdo(libro(Paginas), Paginas).

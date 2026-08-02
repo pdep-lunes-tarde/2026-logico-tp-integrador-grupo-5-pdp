@@ -68,6 +68,59 @@ pasoAlOlvido(NombreHazania, Anio):-
 
 
 
+%Punto 3A
+
+%festivo(pueblo, hazania, anioDeFestivo)
+festivo(weise, hazania(destruirReyDemonio, [frieren, himmel, heiter, eisen], ende), 1340).
+
+%estatuas(pueblo, nombreEstaatua, tipoMaterial, hazania, anio)
+estatuas(auberst, elEquipoDeHeroes, bronce, hazania(destruirReyDemonio, [frieren, himmel, heiter, eisen], ende), 1370).
+estatuas(auberst, elHeroeDelSur, marmol, hazania(destruirSchlatElOmnisciente, [heroeDelSur], ende), 1340).
+
+% mantenimientoEstatua(estatua, anio)
+mantenimientoEstatua(elEquipoDeHeroes, 1400).
+mantenimientoEstatua(elEquipoDeHeroes, 1450).
+mantenimientoEstatua(elHeroeDelSur, 1410).
+
+%Punto 3B
+%limiteEstatua(tipoMaterial, limiteEstatua)
+limiteEstatua(marmol, 30).
+limiteEstatua(bronce, 15).
+
+%estatuaEnBuenEstado(estatua, anio)
+%estutua en buen estado sin mantenimiento
+estatuaEnBuenEstado(Estatua, Anio):-
+    estatuas(_, Estatua, TipoMaterial, _, AnioEstatua),         %estatuas(pueblo, nombreEstaatua, tipoMaterial, hazania, anio)
+    limiteEstatua(TipoMaterial, LimiteEstatua),                 %limiteEstatua(tipoMaterial, limiteEstatua)
+    Anio >= AnioEstatua,
+    Anio - AnioEstatua =< LimiteEstatua.
+
+%estatua en buen estado con mantenimiento
+estatuaEnBuenEstado(Estatua, Anio):-
+    estatuas(_, Estatua, TipoMaterial, _, AnioEstatua),         %estatuas(pueblo, nombreEstaatua, tipoMaterial, hazania, anio)
+    mantenimientoEstatua(Estatua, AnioMantenimiento),           % mantenimientoEstatua(estatua, anio)
+    limiteEstatua(TipoMaterial, LimiteEstatua),                 %limiteEstatua(tipoMaterial, limiteEstatua)
+    Anio >= AnioMantenimiento,
+    Anio - AnioMantenimiento =< LimiteEstatua.
+
+hazaniaRecordada(Persona, NombreHazania, Anio):-
+    habitante(Persona, _, Nacimiento, Pueblo),                          %habitante(nombre, raza, nacimiento, pueblo).
+    festivo(Pueblo, hazania(NombreHazania, _, _), AnioDeFestivo),       %hazania(nombreHazania, [personas], lugar)
+    Anio >= AnioDeFestivo,
+    Anio >= Nacimiento,
+    estaVivoEn(Persona, Anio).
+
+hazaniaRecordada(Persona, NombreHazania, Anio):-
+    habitante(Persona, _, Nacimiento, Pueblo),                                      %habitante(nombre, raza, nacimiento, pueblo).
+    estatuas(Pueblo, Estatua, _, hazania(NombreHazania,_, _), AnioEstatua),         %hazania(nombreHazania, [personas], lugar)
+    estatuaEnBuenEstado(Estatua, Anio),                                             %estatuaEnBuenEstado(estatua, anio)    
+    Anio >= Nacimiento,
+    estaVivoEn(Persona, Anio).
+
+
+
+
+
 %Tests
 :- begin_tests(habitantes).
 
@@ -122,3 +175,34 @@ test("Destruir al demonio Aura no pasó al olvido en 1440", [fail]):-
     pasoAlOlvido(destruirAura, 1440).
 
 :- end_tests(recuerdos).
+
+
+:- begin_tests(conmemoraciones).
+test("Lawine recuerda destruir al rey demonio en 1400, poruqe en Auberst hay una estatua de buen estado", nondet):-
+    hazaniaRecordada(lawine, destruirReyDemonio, 1400).
+test("Lawine no recuerda destuir al rey demonio en 1390 porque la estatua no esta en buen estado", [fail]):-
+    hazaniaRecordada(lawine, destruirReyDemonio, 1390).
+test("Fern recierda destuir al rey demonio en 1400, porque se conmemora con un dia de destivo", nondet):-
+    hazaniaRecordada(fern, destruirReyDemonio, 1400).
+:- end_tests(conmemoraciones).
+
+:- begin_tests(estatuas).
+%mantenimiento en anio 1400 y 1450
+test("La estatua "elEquipoDeHeroes" esta en buen estado en anio 1380 porque no paso el limite de anios", nondet):-
+    estatuaEnBuenEstado(elEquipoDeHeroes, 1380).
+test("La estatua "elEquipoDeHeroes" esta en buen estado en anio 1410 porque se hizo un mantenimiento en 1400", nondet):-
+    estatuaEnBuenEstado(elEquipoDeHeroes, 1410).
+test("La estatua "elEquipoDeHeroes" esta en buen estado en anio 1460 porque se hizo un mantenimiento en 1450", nondet):-
+    estatuaEnBuenEstado(elEquipoDeHeroes, 1460).
+test("la estatua "elEquipoDeHeroes" no esta en buen estado en anio 1390, porque paso limite de anios", [fail]):-
+    estatuaEnBuenEstado(elEquipoDeHeroes, 1390).
+
+%mantenimiento en anio 1410
+test("La estatua "elHeroeDelSur" esta en buen estado en anio 1360 poruqe no paso el limite de anios", nondet):-
+    estatuaEnBuenEstado(elHeroeDelSur, 1360).
+test("La estatua "elHeroeDelSur" no esta en buen estado en anio 1380 porque paso el limite de anios", [fail]):-
+    estatuaEnBuenEstado(elHeroeDelSur, 1380).
+test("La estatua "elHeroeDelSur" esta en buen estado en anio 1420 porque se hizo un mantenimiento en 1410", nondet):-
+    estatuaEnBuenEstado(elHeroeDelSur, 1420).
+:- end_tests(estatuas).
+

@@ -188,21 +188,21 @@ test("Fern recierda destuir al rey demonio en 1400, porque se conmemora con un d
 
 :- begin_tests(estatuas).
 %mantenimiento en anio 1400 y 1450
-test("La estatua "elEquipoDeHeroes" esta en buen estado en anio 1380 porque no paso el limite de anios", nondet):-
+test("La estatua elEquipoDeHeroes esta en buen estado en anio 1380 porque no paso el limite de anios", nondet):-
     estatuaEnBuenEstado(elEquipoDeHeroes, 1380).
-test("La estatua "elEquipoDeHeroes" esta en buen estado en anio 1410 porque se hizo un mantenimiento en 1400", nondet):-
+test("La estatua elEquipoDeHeroes esta en buen estado en anio 1410 porque se hizo un mantenimiento en 1400", nondet):-
     estatuaEnBuenEstado(elEquipoDeHeroes, 1410).
-test("La estatua "elEquipoDeHeroes" esta en buen estado en anio 1460 porque se hizo un mantenimiento en 1450", nondet):-
+test("La estatua elEquipoDeHeroes esta en buen estado en anio 1460 porque se hizo un mantenimiento en 1450", nondet):-
     estatuaEnBuenEstado(elEquipoDeHeroes, 1460).
-test("la estatua "elEquipoDeHeroes" no esta en buen estado en anio 1390, porque paso limite de anios", [fail]):-
+test("la estatua elEquipoDeHeroes no esta en buen estado en anio 1390, porque paso limite de anios", [fail]):-
     estatuaEnBuenEstado(elEquipoDeHeroes, 1390).
 
 %mantenimiento en anio 1410
-test("La estatua "elHeroeDelSur" esta en buen estado en anio 1360 poruqe no paso el limite de anios", nondet):-
+test("La estatua elHeroeDelSur esta en buen estado en anio 1360 poruqe no paso el limite de anios", nondet):-
     estatuaEnBuenEstado(elHeroeDelSur, 1360).
-test("La estatua "elHeroeDelSur" no esta en buen estado en anio 1380 porque paso el limite de anios", [fail]):-
+test("La estatua elHeroeDelSur no esta en buen estado en anio 1380 porque paso el limite de anios", [fail]):-
     estatuaEnBuenEstado(elHeroeDelSur, 1380).
-test("La estatua "elHeroeDelSur" esta en buen estado en anio 1420 porque se hizo un mantenimiento en 1410", nondet):-
+test("La estatua elHeroeDelSur esta en buen estado en anio 1420 porque se hizo un mantenimiento en 1410", nondet):-
     estatuaEnBuenEstado(elHeroeDelSur, 1420).
 :- end_tests(estatuas).
 

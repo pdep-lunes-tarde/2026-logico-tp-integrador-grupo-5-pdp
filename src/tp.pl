@@ -23,15 +23,16 @@ tiempoDeVida(enano, 350).
 
 
 estaVivoEn(Persona, Anio):-
+    habitante(Persona, _, Nacimiento, _),
+    Nacimiento =< Anio,
+    not(murioEn(Persona, Anio)).
+
+murioEn(Persona, Anio):-
     habitante(Persona, Raza, Nacimiento, _),
     tiempoDeVida(Raza, Esperanza),
-    AnioMaximo is Nacimiento + Esperanza,
-    between(Nacimiento, AnioMaximo, Anio).
+    Nacimiento + Esperanza < Anio.
     
 
-estaVivoEn(Persona, Anio):-
-    habitante(Persona, elfo, Nacimiento, _),
-    Nacimiento =< Anio.
 
 %Punto2A
 conoce(wirbel, hazania(rescatarHermanaWirbel, [stark, fern], klares), 1390, presencio).
@@ -117,9 +118,80 @@ hazaniaRecordada(Persona, NombreHazania, Anio):-
     Anio >= Nacimiento,
     estaVivoEn(Persona, Anio).
 
+%Parte 2
+
+%Punto 4
+puebloRecuerdaHazania(Pueblo, NombreHazania, Anio):-
+    hazaniaRecordada(Persona, NombreHazania, Anio),
+    habitante(Persona, _, _, Pueblo).
+
+paginasLeidasEnPueblo(Pueblo, Anio, PaginasLeidas):-
+    findall(PaginasLibro,
+        (
+            conoce(Persona, _, Anio, libro(PaginasLibro)),
+            habitante(Persona, _, _, Pueblo)
+        ),
+        ListaPaginas
+        ),
+    sum_list(ListaPaginas, PaginasLeidas).
+
+puebloMasLector(Anio, Pueblo):-
+    findall(UnPueblo,
+        habitante(_, _, _, UnPueblo),
+        Pueblos),
+    buscarPuebloMasLector(Pueblos, Anio, _, 0, Pueblo).
+
+buscarPuebloMasLector([], _, PuebloActual, _, PuebloActual).
+buscarPuebloMasLector([UnPueblo|OtrosPueblos], Anio, PuebloActual, PaginasActuales, PuebloMasLector):-
+    paginasLeidasEnPueblo(UnPueblo, Anio, Paginas),
+    Paginas > PaginasActuales,
+    buscarPuebloMasLector(OtrosPueblos, Anio, UnPueblo, Paginas, PuebloMasLector).
+buscarPuebloMasLector([_|OtrosPueblos], Anio, PuebloActual, PaginasActuales, PuebloMasLector):-
+    buscarPuebloMasLector(OtrosPueblos, Anio, PuebloActual, PaginasActuales, PuebloMasLector).
 
 
+esMusical(Pueblo, Anio):-
+    findall(Hazania,
+        puebloRecuerdaHazania(Pueblo, Hazania, Anio),
+        Hazanias),
+    hazaniasConCancion(Hazanias, HazaniasCancion),
+    length(Hazanias, CantidadTotal),
+    length(HazaniasCancion, CantidadCancion),
+    CantidadCancion >= CantidadTotal / 2.
 
+hazaniasConCancion([], []).
+
+hazaniasConCancion([Hazania|Hazanias], [Hazania|HazaniasCancion]):-
+    conoce(_, hazania(Hazania, _, _), _, cancion),
+    hazaniasConCancion(Hazanias, HazaniasCancion).
+
+hazaniasConCancion([Hazania|Hazanias], HazaniasCancion):-
+    not(conoce(_, hazania(Hazania, _, _), _, cancion)),
+    hazaniasConCancion(Hazanias, HazaniasCancion).
+
+esChismoso(Pueblo, Anio):-
+    forall(puebloRecuerdaHazania(Pueblo, Hazania, Anio),
+        not(corroborada(Hazania))
+    ).
+
+esImportante(Hazania, Pueblo, Anio):-
+    puebloRecuerdaHazania(Pueblo, Hazania, Anio),
+    forall(
+        (
+            habitante(Persona, _, _, Pueblo),
+            estaVivoEn(Persona, Anio)
+        ),
+        hazaniaRecordada(Persona, Hazania, Anio)
+    ).
+
+sinPrecedentes(Pueblo, Anio):-
+    forall(
+        esImportante(Hazania, Pueblo, Anio),
+        (
+            conoce(Persona, hazania(Hazania, _, _), _, presencio),
+            habitante(Persona, _, _, Pueblo)
+        )
+    ).
 
 %Tests
 :- begin_tests(habitantes).
@@ -150,7 +222,7 @@ test("Lawine recuerda destruir al demonio Aura en 1400", nondet):-
 test("Lawine ya no recuerda destruir al demonio Aura en 1410 porque pasaron más de 15 años de que escuchó la canción", [fail]):-
     hazaniaRecordada(lawine, destruirAura, 1410).
 
-test("Voll recuerda destruir al demonio Aura en 1450"):-
+test("Voll recuerda destruir al demonio Aura en 1450", nondet):-
     hazaniaRecordada(voll, destruirAura, 1450).
 
 test("Voll no recuerda destruir al demonio Aura en 1460", [fail]):-
@@ -205,4 +277,41 @@ test("La estatua elHeroeDelSur no esta en buen estado en anio 1380 porque paso e
 test("La estatua elHeroeDelSur esta en buen estado en anio 1420 porque se hizo un mantenimiento en 1410", nondet):-
     estatuaEnBuenEstado(elHeroeDelSur, 1420).
 :- end_tests(estatuas).
+
+:- begin_tests(pueblos).
+test("En Weise se recuerda destruir al rey demonio en 1400", nondet):-
+    puebloRecuerdaHazania(weise, destruirReyDemonio, 1400).
+test("En Klares se recuerda rescatar a la hermana de Wirbel en 1395", nondet):-
+    puebloRecuerdaHazania(klares, rescatarHermanaWirbel, 1395).
+test("En Klares no se recuerda destruir al rey demonio en 1395"):-
+    not(puebloRecuerdaHazania(klares, destruirReyDemonio, 1395)).
+
+test("En Weise se leyeron 100 páginas en 1335"):-
+    paginasLeidasEnPueblo(weise, 1335, 100).
+test("En Weise se leyeron 0 páginas en 1336"):-
+    paginasLeidasEnPueblo(weise, 1336, 0).
+
+test("Ende es el pueblo mas lector en 1400", nondet):-
+    puebloMasLector(1400, ende).
+
+test("Aubert es musical en 1395"):-
+    esMusical(aubert, 1395).
+test("Weise no es musical en 1400"):-
+    not(esMusical(weise, 1400)).
+
+test("Ende es chismoso en 1420 ya que solo se recuerda destruir al demonio Aura que no está corroborada"):-
+    esChismoso(ende, 1420).
+test("Weise no es chismoso en 1400"):-
+    not(esChismoso(weise, 1400)).
+
+test("destruir al rey demonio es importante para Weise en 1400", nondet):-
+    esImportante(destruirReyDemonio, weise, 1400).
+test("recuperar al gato perdido no es importante para Weise en 1400 (solo Kanne la recuerda)"):-
+    not(esImportante(recuperarGato, weise, 1400)).
+
+test("Klares vive tiempos sin precedentes en 1395"):-
+    sinPrecedentes(klares, 1395).
+test("Weise no vive tiempos sin precedentes en 1400, destruir al rey demonio es importante para Weise pero nadie de allí presenció esa hazaña."):-
+    not(sinPrecedentes(weise, 1400)).
+:- end_tests(pueblos).
 

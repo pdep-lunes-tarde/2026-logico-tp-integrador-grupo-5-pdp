@@ -84,7 +84,7 @@ estatuas(auberst, elHeroeDelSur, marmol, hazania(destruirSchlatElOmnisciente, [h
 %conmemora(Pueblo, Hazania, AnioComienzo, TipoFestival)
 conmemora(weise, hazania(destruirReyDemonio, [frieren, himmel, heiter, eisen], ende), 1340, festival).
 conmemora(auberst, hazania(destruirReyDemonio, [frieren, himmel, heiter, eisen], ende), 1370, estatua(elEquipoDeHeroes, bronce)).
-conmemora(auberst, hazania(destruirSchlatElOmnisciente, [heroeDelSur], ende), 1370, estatua(elHeroeDelSur, marmol)).
+conmemora(auberst, hazania(destruirSchlatElOmnisciente, [heroeDelSur], ende), 1340, estatua(elHeroeDelSur, marmol)).
 
 % mantenimientoEstatua(estatua, anio)
 mantenimientoEstatua(elEquipoDeHeroes, 1400).
@@ -103,9 +103,9 @@ eventoCuidado(NombreEstatua, Anio):-                            % mantenimientoE
     mantenimientoEstatua(NombreEstatua, Anio).
 
 %estatuaEnBuenEstado(estatua, anio)
-estatuaEnbuenEstado(NombreEstatua, Anio):-
+estatuaEnBuenEstado(NombreEstatua, Anio):-
     conmemora(_, _, _, estatua(NombreEstatua, Material)),       %conmemora(Pueblo, Hazania, AnioComienzo, TipoFestival)
-    limiteEstatua(NombreEstatua, LimiteEstatua),                %limiteEstatua(tipoMaterial, limiteEstatua)
+    limiteEstatua(Material, LimiteEstatua),                %limiteEstatua(tipoMaterial, limiteEstatua)
     eventoCuidado(NombreEstatua, AnioEvento),                   %eventoCuidado(NombreEstatua, Anio)
     AnioEvento =< Anio,
     Anio - AnioEvento =< LimiteEstatua.
@@ -135,9 +135,9 @@ sigueRecordando(presencio, _, _).
 sigueRecordando(festival, _, _).
 sigueRecordando(estatua(NombreEstatua, _), AnioComienzo, Anio):-
     estatuaEnBuenEstado(NombreEstatua, Anio).
-sigueRecordando(MedioDeconocimiento, AnioComienzo, Anio):-
+sigueRecordando(MedioDeConocimiento, AnioComienzo, Anio):-
     duracionRecuerdo(MedioDeConocimiento, Duracion),                    %duracionRecuerdo(MedioDeConocimiento, Duracion)
-    Anio =< AnioConocimiento + Duracion
+    Anio =< AnioComienzo + Duracion.
 
 hazaniaRecordada(Persona, NombreHazania, Anio):-
     conoce(Persona, hazania(NombreHazania, _, _), AnioComienzo, MedioDeConocimiento),               %conoce(Persona, Hazania, AnioComienzo, TipoConmemoracion)

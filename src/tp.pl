@@ -35,6 +35,7 @@ murioEn(Persona, Anio):-
 
 
 %Punto2A
+%conoce(Persona, Hazania, AnioConocimiento, MedioDeConocimiento)
 conoce(wirbel, hazania(rescatarHermanaWirbel, [stark, fern], klares), 1390, presencio).
 conoce(frieren, hazania(rescatarHermanaWirbel, [stark, fern], klares), 1390, presencio).
 conoce(lawine, hazania(destruirAura, [frieren], weise), 1393, cancion).
@@ -70,13 +71,20 @@ pasoAlOlvido(NombreHazania, Anio):-
 
 
 %Punto 3A
-
-%festivo(pueblo, hazania, anioDeFestivo)
+/*
+festivo(pueblo, hazania, anioDeFestivo)
 festivo(weise, hazania(destruirReyDemonio, [frieren, himmel, heiter, eisen], ende), 1340).
 
-%estatuas(pueblo, nombreEstaatua, tipoMaterial, hazania, anio)
+estatuas(pueblo, nombreEstaatua, tipoMaterial, hazania, anio)
 estatuas(auberst, elEquipoDeHeroes, bronce, hazania(destruirReyDemonio, [frieren, himmel, heiter, eisen], ende), 1370).
 estatuas(auberst, elHeroeDelSur, marmol, hazania(destruirSchlatElOmnisciente, [heroeDelSur], ende), 1340).
+*/
+
+%correcciones 3A
+%conmemora(Pueblo, Hazania, AnioComienzo, TipoFestival)
+conmemora(weise, hazania(destruirReyDemonio, [frieren, himmel, heiter, eisen], ende), 1340, festival).
+conmemora(auberst, hazania(destruirReyDemonio, [frieren, himmel, heiter, eisen], ende), 1370, estatua(elEquipoDeHeroes, bronce)).
+conmemora(auberst, hazania(destruirSchlatElOmnisciente, [heroeDelSur], ende), 1370, estatua(elHeroeDelSur, marmol)).
 
 % mantenimientoEstatua(estatua, anio)
 mantenimientoEstatua(elEquipoDeHeroes, 1400).
@@ -88,22 +96,22 @@ mantenimientoEstatua(elHeroeDelSur, 1410).
 limiteEstatua(marmol, 30).
 limiteEstatua(bronce, 15).
 
+%eventoCuidado(NombreEstatua, Anio)
+eventoCuidado(NombreEstatua, Anio):-
+    conmemora(_, _, Anio, estatua(NombreEstatua, _)).           %conmemora(Pueblo, Hazania, AnioComienzo, TipoFestival)
+eventoCuidado(NombreEstatua, Anio):-                            % mantenimientoEstatua(estatua, anio)
+    mantenimientoEstatua(NombreEstatua, Anio).
+
 %estatuaEnBuenEstado(estatua, anio)
-%estutua en buen estado sin mantenimiento
-estatuaEnBuenEstado(Estatua, Anio):-
-    estatuas(_, Estatua, TipoMaterial, _, AnioEstatua),         %estatuas(pueblo, nombreEstaatua, tipoMaterial, hazania, anio)
-    limiteEstatua(TipoMaterial, LimiteEstatua),                 %limiteEstatua(tipoMaterial, limiteEstatua)
-    Anio >= AnioEstatua,
-    Anio - AnioEstatua =< LimiteEstatua.
+estatuaEnbuenEstado(NombreEstatua, Anio):-
+    conmemora(_, _, _, estatua(NombreEstatua, Material)),       %conmemora(Pueblo, Hazania, AnioComienzo, TipoFestival)
+    limiteEstatua(NombreEstatua, LimiteEstatua),                %limiteEstatua(tipoMaterial, limiteEstatua)
+    eventoCuidado(NombreEstatua, AnioEvento),                   %eventoCuidado(NombreEstatua, Anio)
+    AnioEvento =< Anio,
+    Anio - AnioEvento =< LimiteEstatua.
 
-%estatua en buen estado con mantenimiento
-estatuaEnBuenEstado(Estatua, Anio):-
-    estatuas(_, Estatua, TipoMaterial, _, AnioEstatua),         %estatuas(pueblo, nombreEstaatua, tipoMaterial, hazania, anio)
-    mantenimientoEstatua(Estatua, AnioMantenimiento),           % mantenimientoEstatua(estatua, anio)
-    limiteEstatua(TipoMaterial, LimiteEstatua),                 %limiteEstatua(tipoMaterial, limiteEstatua)
-    Anio >= AnioMantenimiento,
-    Anio - AnioMantenimiento =< LimiteEstatua.
 
+/*
 hazaniaRecordada(Persona, NombreHazania, Anio):-
     habitante(Persona, _, Nacimiento, Pueblo),                          %habitante(nombre, raza, nacimiento, pueblo).
     festivo(Pueblo, hazania(NombreHazania, _, _), AnioDeFestivo),       %hazania(nombreHazania, [personas], lugar)
@@ -117,6 +125,27 @@ hazaniaRecordada(Persona, NombreHazania, Anio):-
     estatuaEnBuenEstado(Estatua, Anio),                                             %estatuaEnBuenEstado(estatua, anio)    
     Anio >= Nacimiento,
     estaVivoEn(Persona, Anio).
+*/
+
+conoce(Persona, Hazania, AnioComienzo, MedioDeConocimiento):-
+    habitante(Persona, _, _, Pueblo),                                   %habitante(nombre, raza, nacimiento, pueblo).
+    conmemora(Pueblo, Hazania, AnioComienzo, MedioDeConocimiento).      %conmemora(Pueblo, Hazania, AnioComienzo, TipoFestival)
+
+sigueRecordando(presencio, _, _).
+sigueRecordando(festival, _, _).
+sigueRecordando(estatua(NombreEstatua, _), AnioComienzo, Anio):-
+    estatuaEnBuenEstado(NombreEstatua, Anio).
+sigueRecordando(MedioDeconocimiento, AnioComienzo, Anio):-
+    duracionRecuerdo(MedioDeConocimiento, Duracion),                    %duracionRecuerdo(MedioDeConocimiento, Duracion)
+    Anio =< AnioConocimiento + Duracion
+
+hazaniaRecordada(Persona, NombreHazania, Anio):-
+    conoce(Persona, hazania(NombreHazania, _, _), AnioComienzo, MedioDeConocimiento),               %conoce(Persona, Hazania, AnioComienzo, TipoConmemoracion)
+    Anio >= AnioComienzo,
+    sigueRecordando(MedioDeConocimiento, AnioComienzo, Anio),
+    estaVivoEn(Persona, Anio).
+
+
 
 %Parte 2
 

@@ -146,8 +146,9 @@ hazaniaRecordada(Persona, NombreHazania, Anio):-
     estaVivoEn(Persona, Anio).
 
 
-
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %Parte 2
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %Punto 4
 puebloRecuerdaHazania(Pueblo, NombreHazania, Anio):-
@@ -221,6 +222,25 @@ sinPrecedentes(Pueblo, Anio):-
             habitante(Persona, _, _, Pueblo)
         )
     ).
+
+%Punto 5
+%A
+esHeroe(Persona):-
+    conoce(_, hazania(_, Heroes, _), _, _),      %conoce(Persona,hazania(nombreHazania, [personas], lugar), AnioConocimiento, MedioDeConocimiento)
+    member(Persona, Heroes). 
+%B
+inspiro(Inspirador, Heroe):-
+    conoce(Heroe, hazania(_, Heroes, _), _, _),  %conoce(Persona,hazania(nombreHazania, [personas], lugar), AnioConocimiento, MedioDeConocimiento)
+    member(Inspirador, Heroes),
+    Inspirador \= Heroe.
+%C
+cadenaInspiracion(Inicio, [Inicio]).
+cadenaInspiracion(Inicio, [Inicio | Resto]):-
+    inspiro(Inicio, Siguiente),
+    cadenaInspiracion(Siguiente, Resto),        
+    not(member(Inicio, Resto)).
+
+
 
 %Tests
 :- begin_tests(habitantes).
@@ -343,4 +363,31 @@ test("Klares vive tiempos sin precedentes en 1395"):-
 test("Weise no vive tiempos sin precedentes en 1400, destruir al rey demonio es importante para Weise pero nadie de allí presenció esa hazaña."):-
     not(sinPrecedentes(weise, 1400)).
 :- end_tests(pueblos).
+
+%tests Punto 5
+:- begin_tests(esHeroe).
+test("Frieren es un Heroe, ya que participo en hazania destruirAlReyDemonio", nondet):-
+    esHeroe(frieren).
+test("Wirbel no es un Heroe porque no participo en ninguna Hazania",[fail]):-
+    esHeroe(wirbel).
+:- end_tests(esHeroe).
+
+:- begin_tests(inspirador).
+test("Frieren inspiro a Fern, Fern conoce destruirAlReyDemonio donde Frieren participo", nondet):-
+    inspiro(frieren, fern).
+test("stark inspiro a Frieren, Frieren conoce rescatarALaHermanaDeWirbel donde Stark participo", nondet):-
+    inspiro(stark, frieren).
+test("nadie inspiro a Eisen a ser un Heroe, ya que no sabemos de ninguna Hazania que el conozca",[fail]):-
+    inspiro(_, eisen).
+:- end_tests(inspirador).
+
+:- begin_tests(cadenas).
+test("Himmel → Fern → Frieren → Denken es una cadena de inspiración válida", nondet):-
+    cadenaInspiracion(himmel, [himmel,fern,frieren,denken]).
+test("Denken → Frieren no es una cadena de inspiración válida porque Denken no inspiró a Frieren",[fail]):-
+    cadenaInspiracion(denken, [denken,frieren]).
+test("Frieren → Fern → Frieren no es una cadena de inspiración válida ya que se repite 2 veces Frieren", [fail]):-
+    cadenaInspiracion(frieren, [frieren, fern, frieren]).
+:- end_tests(cadenas).
+
 

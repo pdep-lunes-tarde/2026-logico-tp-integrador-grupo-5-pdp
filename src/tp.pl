@@ -33,9 +33,8 @@ murioEn(Persona, Anio):-
     Nacimiento + Esperanza < Anio.
     
 
-
-%Punto2A
-%conoce(Persona, Hazania, AnioConocimiento, MedioDeConocimiento)
+% Punto2A
+% conoce(Persona, Hazania, AnioConocimiento, MedioDeConocimiento)
 conoce(wirbel, hazania(rescatarHermanaWirbel, [stark, fern], klares), 1390, presencio).
 conoce(frieren, hazania(rescatarHermanaWirbel, [stark, fern], klares), 1390, presencio).
 conoce(lawine, hazania(destruirAura, [frieren], weise), 1393, cancion).
@@ -43,19 +42,18 @@ conoce(voll, hazania(destruirAura, [denken], auberst), 1400, libro(50)).
 conoce(serie, hazania(destruirReyDemonio, [frieren, himmel, heiter, eisen], ende), 1335, libro(100)).
 conoce(kanne, hazania(recuperarGato, [himmel, frieren], weise), 1375, presencio).
 
-duracionRecuerdo(cancion, 15).
-duracionRecuerdo(libro(Paginas), Paginas).
+sigueRecordando(presencio, _, _).
+
+sigueRecordando(cancion, AnioConocio, Anio):-
+    Anio =< AnioConocio + 15.
+
+sigueRecordando(libro(Pags), AnioConocio, Anio):-
+    Anio =< AnioConocio + Pags.
 
 hazaniaRecordada(Persona, NombreHazania, Anio):-
-    conoce(Persona, hazania(NombreHazania, _, _), AnioConocimiento, presencio),
-    Anio >= AnioConocimiento,
-    estaVivoEn(Persona, Anio).
-
-hazaniaRecordada(Persona, NombreHazania, Anio):-
-    conoce(Persona, hazania(NombreHazania, _, _), AnioConocimiento, MedioDeConocimiento),
-    duracionRecuerdo(MedioDeConocimiento, Duracion),
-    Anio >= AnioConocimiento,
-    Anio =< AnioConocimiento + Duracion.
+    conoce(Persona, hazania(NombreHazania, _, _), AnioConocio, Medio),
+    estaVivoEn(Persona, Anio),
+    sigueRecordando(Medio, AnioConocio, Anio).
 
 %Punto2B
 corroborada(Nombre):-
@@ -64,10 +62,11 @@ corroborada(Nombre):-
         conoce(_, hazania(Nombre, Personas2, Lugar2), _, _),
         (Personas == Personas2, Lugar == Lugar2)
     ).
+
 %Punto2C
 pasoAlOlvido(NombreHazania, Anio):-
+    conoce(_, hazania(NombreHazania, _, _), _, _),
     not(hazaniaRecordada(_, NombreHazania, Anio)).
-
 
 
 %Punto 3A

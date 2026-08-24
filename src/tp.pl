@@ -240,11 +240,12 @@ equipoDeLosSuenios(Heroe, Equipo):-
 test("humanos y enanos no viven mas alla de su esperanza de vida", nondet):-
     estaVivoEn(kanne, 1370),
     estaVivoEn(voll, 1550),
+    not(estaVivoEn(voll, 1551))
     not(estaVivoEn(kanne, 2000)).
 
 test("nadie puede vivir antes de haber nacido, sin importar su raza"):-
     not(estaVivoEn(denken, 1289)),
-    not(estaVivoEn(voll, 1999)),
+    not(estaVivoEn(voll, 1199)),
     not(estaVivoEn(serie, 499)).
 
 test("los elfos no mueren de viejos"):-

@@ -239,7 +239,7 @@ equipoDeLosSuenios(Heroe, Equipo):-
 test("humanos y enanos no viven mas alla de su esperanza de vida", nondet):-
     estaVivoEn(kanne, 1370),
     estaVivoEn(voll, 1550),
-    not(estaVivoEn(voll, 1551))
+    not(estaVivoEn(voll, 1551)),
     not(estaVivoEn(kanne, 2000)).
 
 test("nadie puede vivir antes de haber nacido, sin importar su raza"):-
@@ -388,14 +388,14 @@ test("Frieren → Fern → Frieren no es una cadena de inspiración válida ya q
 
 :- end_tests(cadenas).
 
-% test("Fern + Himmel es un dream team válido para Fern", nondet):-
-%     equipoDeLosSuenios(fern, [fern, himmel]).
+ test("Fern + Himmel es un dream team válido para Fern", nondet):-
+     equipoDeLosSuenios(fern, [fern, himmel]).
 
-% test("Himmel + Fern es un dream team válido para Fern", nondet):-
-%     equipoDeLosSuenios(fern, [himmel, fern]).
+ test("Himmel + Fern es un dream team válido para Fern", nondet):-
+     equipoDeLosSuenios(fern, [himmel, fern]).
 
-% test("Fern sola no es un dream team válido para Fern", [fail]):-
-%     equipoDeLosSuenios(fern, [fern]).
+ test("Fern sola no es un dream team válido para Fern", [fail]):-
+     equipoDeLosSuenios(fern, [fern]).
 
-% test("Frieren sola no es un dream team válido para Fern", [fail]):-
-%     equipoDeLosSuenios(fern, [frieren]).
+ test("Frieren sola no es un dream team válido para Fern", [fail]):-
+     equipoDeLosSuenios(fern, [frieren]).

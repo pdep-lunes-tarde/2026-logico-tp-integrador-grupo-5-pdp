@@ -1,4 +1,4 @@
-%Parte 1.a
+%!Parte 1.a
 
 %habitante(nombre, raza, nacimiento, pueblo).
 
@@ -17,7 +17,7 @@ habitante(serie, elfo, 500, weise).
 habitante(frieren, elfo, 100, weise).
 
 
-%Parte 1.b
+%!Parte 1.b
 tiempoDeVida(humano, 80).
 tiempoDeVida(enano, 350).
 
@@ -56,7 +56,7 @@ hazaniaRecordada(Persona, NombreHazania, Anio):-
     Anio >= AnioConocio,            % para el punto 3
     sigueRecordando(Medio, AnioConocio, Anio).
 
-%Punto2B
+%!Punto2B
 corroborada(Nombre):-
     conoce(_, hazania(Nombre, Personas, Lugar), _, _),
     forall(
@@ -64,13 +64,13 @@ corroborada(Nombre):-
         (Personas == Personas2, Lugar == Lugar2)
     ).
 
-%Punto2C
+%!Punto2C
 pasoAlOlvido(NombreHazania, Anio):-
     conoce(_, hazania(NombreHazania, _, _), _, _),
     not(hazaniaRecordada(_, NombreHazania, Anio)).
 
 
-%Punto 3A
+%!Punto 3A
 
 %conmemora(Pueblo, Hazania, AnioComienzo, TipoFestival)
 conmemora(weise, hazania(destruirReyDemonio, [frieren, himmel, heiter, eisen], ende), 1340, festival).
@@ -82,7 +82,7 @@ mantenimientoEstatua(elEquipoDeHeroes, 1400).
 mantenimientoEstatua(elEquipoDeHeroes, 1450).
 mantenimientoEstatua(elHeroeDelSur, 1410).
 
-%Punto 3B
+%!Punto 3B
 %limiteEstatua(tipoMaterial, limiteEstatua)
 limiteEstatua(marmol, 30).
 limiteEstatua(bronce, 15).
@@ -116,7 +116,7 @@ sigueRecordando(estatua(NombreEstatua, _), AnioComienzo, Anio):-
 %Parte 2
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-%Punto 4
+%!Punto 4
 puebloRecuerdaHazania(Pueblo, NombreHazania, Anio):-
     hazaniaRecordada(Persona, NombreHazania, Anio),
     habitante(Persona, _, _, Pueblo).
@@ -189,7 +189,7 @@ sinPrecedentes(Pueblo, Anio):-
         )
     ).
 
-%Punto 5
+%!Punto 5
 %A
 esHeroe(Persona):-
     conoce(_, hazania(_, Heroes, _), _, _),      %conoce(Persona,hazania(nombreHazania, [personas], lugar), AnioConocimiento, MedioDeConocimiento)
@@ -206,9 +206,35 @@ cadenaInspiracion(Inicio, [Inicio | Resto]):-
     cadenaInspiracion(Siguiente, Resto),        
     not(member(Inicio, Resto)).
 
+%!Punto 6
+esAntecesor(Antecesor, Heroe):-
+    cadenaInspiracion(Antecesor, Cadena),
+    append(Antecesores, [Heroe|_], Cadena),
+    member(Antecesor, Antecesores).
+
+antecesoresDe(Heroe, Antecesores):-
+    findall(Antecesor, esAntecesor(Antecesor, Heroe), Antecesores).
+
+subconjunto([], []).
+
+% subconjunto(ListaAntecesores, AntecesoresElegidos)
+subconjunto([Personaje | PersonajesRestantes], [Personaje | SubconjuntoRestante]):-
+    subconjunto(PersonajesRestantes, SubconjuntoRestante).
+
+subconjunto([_ | PersonajesRestantes], Subconjunto):-
+    subconjunto(PersonajesRestantes, Subconjunto).
+
+equipoDeLosSuenios(Heroe, Equipo):-
+    esHeroe(Heroe),
+    antecesoresDe(Heroe, ListaAntecesores),
+    subconjunto(ListaAntecesores, AntecesoresElegidos),
+    AntecesoresElegidos \= [],
+    append(AntecesoresElegidos, [Heroe], Integrantes),
+    permutation(Integrantes, Equipo).
 
 
-%Tests
+
+%!Tests
 :- begin_tests(habitantes).
 
 test("humanos y enanos no viven mas alla de su esperanza de vida", nondet):-
@@ -255,7 +281,7 @@ test("Rescatar a la hermana de Wirbel es una hazaña corroborada", nondet):-
 test("Destruir al demonio Aura no es una hazaña corroborada", [fail]):-
     corroborada(destruirAura).
 
-test("Destruir al demonio Aura pasó al olvido en 1460"):-
+test("Destruir al demonio Aura pasó al olvido en 1460", nondet):-
     pasoAlOlvido(destruirAura, 1460).
 
 test("Destruir al demonio Aura no pasó al olvido en 1440", [fail]):-
@@ -271,6 +297,7 @@ test("Lawine no recuerda destuir al rey demonio en 1390 porque la estatua no est
     hazaniaRecordada(lawine, destruirReyDemonio, 1390).
 test("Fern recierda destuir al rey demonio en 1400, porque se conmemora con un dia de destivo", nondet):-
     hazaniaRecordada(fern, destruirReyDemonio, 1400).
+
 :- end_tests(conmemoraciones).
 
 :- begin_tests(estatuas).
@@ -291,6 +318,7 @@ test("La estatua elHeroeDelSur no esta en buen estado en anio 1380 porque paso e
     estatuaEnBuenEstado(elHeroeDelSur, 1380).
 test("La estatua elHeroeDelSur esta en buen estado en anio 1420 porque se hizo un mantenimiento en 1410", nondet):-
     estatuaEnBuenEstado(elHeroeDelSur, 1420).
+
 :- end_tests(estatuas).
 
 :- begin_tests(pueblos).
@@ -328,6 +356,7 @@ test("Klares vive tiempos sin precedentes en 1395"):-
     sinPrecedentes(klares, 1395).
 test("Weise no vive tiempos sin precedentes en 1400, destruir al rey demonio es importante para Weise pero nadie de allí presenció esa hazaña."):-
     not(sinPrecedentes(weise, 1400)).
+
 :- end_tests(pueblos).
 
 %tests Punto 5
@@ -336,6 +365,7 @@ test("Frieren es un Heroe, ya que participo en hazania destruirAlReyDemonio", no
     esHeroe(frieren).
 test("Wirbel no es un Heroe porque no participo en ninguna Hazania",[fail]):-
     esHeroe(wirbel).
+
 :- end_tests(esHeroe).
 
 :- begin_tests(inspirador).
@@ -345,6 +375,7 @@ test("stark inspiro a Frieren, Frieren conoce rescatarALaHermanaDeWirbel donde S
     inspiro(stark, frieren).
 test("nadie inspiro a Eisen a ser un Heroe, ya que no sabemos de ninguna Hazania que el conozca",[fail]):-
     inspiro(_, eisen).
+
 :- end_tests(inspirador).
 
 :- begin_tests(cadenas).
@@ -354,6 +385,17 @@ test("Denken → Frieren no es una cadena de inspiración válida porque Denken 
     cadenaInspiracion(denken, [denken,frieren]).
 test("Frieren → Fern → Frieren no es una cadena de inspiración válida ya que se repite 2 veces Frieren", [fail]):-
     cadenaInspiracion(frieren, [frieren, fern, frieren]).
+
 :- end_tests(cadenas).
 
+% test("Fern + Himmel es un dream team válido para Fern", nondet):-
+%     equipoDeLosSuenios(fern, [fern, himmel]).
 
+% test("Himmel + Fern es un dream team válido para Fern", nondet):-
+%     equipoDeLosSuenios(fern, [himmel, fern]).
+
+% test("Fern sola no es un dream team válido para Fern", [fail]):-
+%     equipoDeLosSuenios(fern, [fern]).
+
+% test("Frieren sola no es un dream team válido para Fern", [fail]):-
+%     equipoDeLosSuenios(fern, [frieren]).

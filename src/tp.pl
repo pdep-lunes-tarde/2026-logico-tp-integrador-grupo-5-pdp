@@ -162,7 +162,6 @@ hazaniasConCancion([Hazania|Hazanias], [Hazania|HazaniasCancion]):-
     hazaniasConCancion(Hazanias, HazaniasCancion).
 
 hazaniasConCancion([Hazania|Hazanias], HazaniasCancion):-
-    not(conoce(_, hazania(Hazania, _, _), _, cancion)),
     hazaniasConCancion(Hazanias, HazaniasCancion).
 
 esChismoso(Pueblo, Anio):-

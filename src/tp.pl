@@ -199,17 +199,29 @@ inspiro(Inspirador, Heroe):-
     member(Inspirador, Heroes),
     Inspirador \= Heroe.
 %C
-cadenaInspiracion(Inicio, [Inicio]).
-cadenaInspiracion(Inicio, [Inicio | Resto]):-
-    inspiro(Inicio, Siguiente),
-    cadenaInspiracion(Siguiente, Resto),        
-    not(member(Inicio, Resto)).
+cadenaInspiracion(Inicio, Cadena):-
+    cadenaInspiracionAux(Inicio, [], Cadena).
+
+cadenaInspiracionAux(Heroe, Visitados, [Heroe]):-
+    not(member(Heroe, Visitados)).
+
+cadenaInspiracionAux(Heroe, Visitados, [Heroe|Resto]):-
+    not(member(Heroe, Visitados)),
+    inspiro(Heroe, Siguiente),
+    cadenaInspiracionAux(Siguiente, [Heroe|Visitados], Resto).
 
 %!Punto 6
 esAntecesor(Antecesor, Heroe):-
-    cadenaInspiracion(Antecesor, Cadena),
-    append(Antecesores, [Heroe|_], Cadena),
-    member(Antecesor, Antecesores).
+    esAntecesorAux(Antecesor, Heroe, []).
+
+esAntecesorAux(Antecesor, Heroe, Visitados):-
+    not(member(Antecesor, Visitados)),
+    inspiro(Antecesor, Heroe).
+
+esAntecesorAux(Antecesor, Heroe, Visitados):-
+    not(member(Antecesor, Visitados)),
+    inspiro(Antecesor, Intermedio),
+    esAntecesorAux(Intermedio, Heroe, [Antecesor|Visitados]).
 
 antecesoresDe(Heroe, Antecesores):-
     findall(Antecesor, esAntecesor(Antecesor, Heroe), Antecesores).
@@ -388,14 +400,16 @@ test("Frieren → Fern → Frieren no es una cadena de inspiración válida ya q
 
 :- end_tests(cadenas).
 
+:- begin_tests(dreamteam).
  test("Fern + Himmel es un dream team válido para Fern", nondet):-
-     equipoDeLosSuenios(fern, [fern, himmel]).
+    equipoDeLosSuenios(fern, [fern, himmel]).
 
  test("Himmel + Fern es un dream team válido para Fern", nondet):-
-     equipoDeLosSuenios(fern, [himmel, fern]).
+    equipoDeLosSuenios(fern, [himmel, fern]).
 
  test("Fern sola no es un dream team válido para Fern", [fail]):-
-     equipoDeLosSuenios(fern, [fern]).
+    equipoDeLosSuenios(fern, [fern]).
 
  test("Frieren sola no es un dream team válido para Fern", [fail]):-
-     equipoDeLosSuenios(fern, [frieren]).
+    equipoDeLosSuenios(fern, [frieren]).
+:- end_tests(dreamteam).

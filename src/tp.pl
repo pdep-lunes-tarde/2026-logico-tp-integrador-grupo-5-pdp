@@ -132,39 +132,32 @@ paginasLeidasEnPueblo(Pueblo, Anio, PaginasLeidas):-
     sum_list(ListaPaginas, PaginasLeidas).
 
 puebloMasLector(Anio, Pueblo):-
-    findall(UnPueblo,
-        habitante(_, _, _, UnPueblo),
-        Pueblos),
-    buscarPuebloMasLector(Pueblos, Anio, _, 0, Pueblo).
-
-buscarPuebloMasLector([], _, PuebloActual, _, PuebloActual).
-buscarPuebloMasLector([UnPueblo|OtrosPueblos], Anio, PuebloActual, PaginasActuales, PuebloMasLector):-
-    paginasLeidasEnPueblo(UnPueblo, Anio, Paginas),
-    Paginas > PaginasActuales,
-    buscarPuebloMasLector(OtrosPueblos, Anio, UnPueblo, Paginas, PuebloMasLector).
-buscarPuebloMasLector([_|OtrosPueblos], Anio, PuebloActual, PaginasActuales, PuebloMasLector):-
-    buscarPuebloMasLector(OtrosPueblos, Anio, PuebloActual, PaginasActuales, PuebloMasLector).
-
+    paginasLeidasEnPueblo(Pueblo, Anio, PaginasPueblo),
+    forall(
+        (habitante(_, _, _, OtroPueblo), paginasLeidasEnPueblo(OtroPueblo, Anio, PaginasOtroPueblo)),
+        not(PaginasOtroPueblo > PaginasPueblo)).
 
 esMusical(Pueblo, Anio):-
     findall(Hazania,
         puebloRecuerdaHazania(Pueblo, Hazania, Anio),
         Hazanias),
-    hazaniasConCancion(Hazanias, HazaniasCancion),
+    hazaniasConCancion(Hazanias, HazaniasCancion, Pueblo),
     length(Hazanias, CantidadTotal),
     length(HazaniasCancion, CantidadCancion),
     CantidadCancion >= CantidadTotal / 2.
 
-hazaniasConCancion([], []).
+hazaniasConCancion([], [], _).
 
-hazaniasConCancion([Hazania|Hazanias], [Hazania|HazaniasCancion]):-
-    conoce(_, hazania(Hazania, _, _), _, cancion),
-    hazaniasConCancion(Hazanias, HazaniasCancion).
+hazaniasConCancion([Hazania|Hazanias], [Hazania|HazaniasCancion], Pueblo):-
+    conoce(Persona, hazania(Hazania, _, _), _, cancion),
+    habitante(Persona, _, _, Pueblo),
+    hazaniasConCancion(Hazanias, HazaniasCancion, Pueblo).
 
-hazaniasConCancion([Hazania|Hazanias], HazaniasCancion):-
-    hazaniasConCancion(Hazanias, HazaniasCancion).
+hazaniasConCancion([_|Hazanias], HazaniasCancion, Pueblo):-
+    hazaniasConCancion(Hazanias, HazaniasCancion, Pueblo).
 
 esChismoso(Pueblo, Anio):-
+    puebloRecuerdaHazania(Pueblo, _, Anio),
     forall(puebloRecuerdaHazania(Pueblo, Hazania, Anio),
         not(corroborada(Hazania))
     ).
@@ -180,6 +173,7 @@ esImportante(Hazania, Pueblo, Anio):-
     ).
 
 sinPrecedentes(Pueblo, Anio):-
+    esImportante(_, Pueblo, Anio),
     forall(
         esImportante(Hazania, Pueblo, Anio),
         (
@@ -354,7 +348,7 @@ test("Aubert es musical en 1395"):-
 test("Weise no es musical en 1400"):-
     not(esMusical(weise, 1400)).
 
-test("Ende es chismoso en 1420 ya que solo se recuerda destruir al demonio Aura que no está corroborada"):-
+test("Ende es chismoso en 1420 ya que solo se recuerda destruir al demonio Aura que no está corroborada", nondet):-
     esChismoso(ende, 1420).
 test("Weise no es chismoso en 1400"):-
     not(esChismoso(weise, 1400)).
@@ -364,7 +358,7 @@ test("destruir al rey demonio es importante para Weise en 1400", nondet):-
 test("recuperar al gato perdido no es importante para Weise en 1400 (solo Kanne la recuerda)"):-
     not(esImportante(recuperarGato, weise, 1400)).
 
-test("Klares vive tiempos sin precedentes en 1395"):-
+test("Klares vive tiempos sin precedentes en 1395", nondet):-
     sinPrecedentes(klares, 1395).
 test("Weise no vive tiempos sin precedentes en 1400, destruir al rey demonio es importante para Weise pero nadie de allí presenció esa hazaña."):-
     not(sinPrecedentes(weise, 1400)).

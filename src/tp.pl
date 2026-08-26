@@ -338,7 +338,7 @@ test("El total de paginas leidas en un pueblo en un anio es la sumatoria de toda
     assertion(paginasLeidasEnPueblo(weise, 1335, 100)),
     assertion(paginasLeidasEnPueblo(weise, 1336, 0)).
 
-test("El pueblo mas lector es aquel que leyó mas paginas que los demas pueblos en un año determinado.", nondet):-
+test("Un pueblo es el mas lector en un año determinado si ningun otro pueblo leyó mas paginas que él.", nondet):-
     puebloMasLector(1400, ende).
 
 test("Un pueblo es musical si la mayoria de las hazanias recordadas en el pueblo son mediante canciones."):-
@@ -353,7 +353,7 @@ test("Una Hazania es importante para un pueblo en un año determinado si todos l
     assertion(esImportante(destruirReyDemonio, weise, 1400)),
     assertion(not(esImportante(recuperarGato, weise, 1400))).
 
-test("un pueblo vive tiempos sin precedentes en un año determinado si todas las hazanias importantes del pueblo fueron presenciadas por alguien del pueblo.", nondet):-
+test("Un pueblo vive tiempos sin precedentes en un año determinado si todas las hazanias importantes del pueblo fueron presenciadas por alguien del pueblo.", nondet):-
     assertion(sinPrecedentes(klares, 1395)),
     assertion(not(sinPrecedentes(weise, 1400))).
 

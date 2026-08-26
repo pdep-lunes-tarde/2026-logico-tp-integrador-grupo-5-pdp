@@ -243,15 +243,15 @@ equipoDeLosSuenios(Heroe, Equipo):-
 :- begin_tests(habitantes).
 
 test("humanos y enanos no viven mas alla de su esperanza de vida", nondet):-
-    estaVivoEn(kanne, 1370),
-    estaVivoEn(voll, 1550),
-    not(estaVivoEn(voll, 1551)),
-    not(estaVivoEn(kanne, 2000)).
+    assertion(estaVivoEn(kanne, 1370)),
+    assertion(estaVivoEn(voll, 1550)),
+    assertion(not(estaVivoEn(voll, 1551))),
+    assertion(not(estaVivoEn(kanne, 2000))).
 
 test("nadie puede vivir antes de haber nacido, sin importar su raza"):-
-    not(estaVivoEn(denken, 1289)),
-    not(estaVivoEn(voll, 1199)),
-    not(estaVivoEn(serie, 499)).
+    assertion(not(estaVivoEn(denken, 1289))),
+    assertion(not(estaVivoEn(voll, 1199))),
+    assertion(not(estaVivoEn(serie, 499))).
 
 test("los elfos no mueren de viejos"):-
     estaVivoEn(serie, 5000).
@@ -328,40 +328,34 @@ test("La estatua elHeroeDelSur esta en buen estado en anio 1420 porque se hizo u
 :- end_tests(estatuas).
 
 :- begin_tests(pueblos).
-test("En Weise se recuerda destruir al rey demonio en 1400", nondet):-
-    puebloRecuerdaHazania(weise, destruirReyDemonio, 1400).
-test("En Klares se recuerda rescatar a la hermana de Wirbel en 1395", nondet):-
-    puebloRecuerdaHazania(klares, rescatarHermanaWirbel, 1395).
-test("En Klares no se recuerda destruir al rey demonio en 1395"):-
-    not(puebloRecuerdaHazania(klares, destruirReyDemonio, 1395)).
 
-test("En Weise se leyeron 100 páginas en 1335"):-
-    paginasLeidasEnPueblo(weise, 1335, 100).
-test("En Weise se leyeron 0 páginas en 1336"):-
-    paginasLeidasEnPueblo(weise, 1336, 0).
+test("Un pueblo recuerda una hazania si un habitante que vive en ese pueblo la recuerda.", nondet):-
+    assertion(puebloRecuerdaHazania(weise, destruirReyDemonio, 1400)),
+    assertion(puebloRecuerdaHazania(klares, rescatarHermanaWirbel, 1395)),
+    assertion(not(puebloRecuerdaHazania(klares, destruirReyDemonio, 1395))).
 
-test("Ende es el pueblo mas lector en 1400", nondet):-
+test("El total de paginas leidas en un pueblo en un anio es la sumatoria de todas las paginas leidas por cada habitante que vive en ese pueblo."):-
+    assertion(paginasLeidasEnPueblo(weise, 1335, 100)),
+    assertion(paginasLeidasEnPueblo(weise, 1336, 0)).
+
+test("El pueblo mas lector es aquel que leyó mas paginas que los demas pueblos en un año determinado.", nondet):-
     puebloMasLector(1400, ende).
 
-test("Aubert es musical en 1395"):-
-    esMusical(aubert, 1395).
-test("Weise no es musical en 1400"):-
-    not(esMusical(weise, 1400)).
+test("Un pueblo es musical si la mayoria de las hazanias recordadas en el pueblo son mediante canciones."):-
+    assertion(esMusical(aubert, 1395)),
+    assertion(not(esMusical(weise, 1400))).
 
-test("Ende es chismoso en 1420 ya que solo se recuerda destruir al demonio Aura que no está corroborada", nondet):-
-    esChismoso(ende, 1420).
-test("Weise no es chismoso en 1400"):-
-    not(esChismoso(weise, 1400)).
+test("Un pueblo es chismoso si ninguna de las hazanias recordadas por el pueblo esta corroborada.", nondet):-
+    assertion(esChismoso(ende, 1420)),
+    assertion(not(esChismoso(weise, 1400))).
 
-test("destruir al rey demonio es importante para Weise en 1400", nondet):-
-    esImportante(destruirReyDemonio, weise, 1400).
-test("recuperar al gato perdido no es importante para Weise en 1400 (solo Kanne la recuerda)"):-
-    not(esImportante(recuperarGato, weise, 1400)).
+test("Una Hazania es importante para un pueblo en un año determinado si todos los habitantes vivos del pueblo recuerdan esa hazania.", nondet):-
+    assertion(esImportante(destruirReyDemonio, weise, 1400)),
+    assertion(not(esImportante(recuperarGato, weise, 1400))).
 
-test("Klares vive tiempos sin precedentes en 1395", nondet):-
-    sinPrecedentes(klares, 1395).
-test("Weise no vive tiempos sin precedentes en 1400, destruir al rey demonio es importante para Weise pero nadie de allí presenció esa hazaña."):-
-    not(sinPrecedentes(weise, 1400)).
+test("un pueblo vive tiempos sin precedentes en un año determinado si todas las hazanias importantes del pueblo fueron presenciadas por alguien del pueblo.", nondet):-
+    assertion(sinPrecedentes(klares, 1395)),
+    assertion(not(sinPrecedentes(weise, 1400))).
 
 :- end_tests(pueblos).
 

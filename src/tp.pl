@@ -205,20 +205,13 @@ cadenaInspiracionAux(Heroe, Visitados, [Heroe|Resto]):-
     cadenaInspiracionAux(Siguiente, [Heroe|Visitados], Resto).
 
 %!Punto 6
-esAntecesor(Antecesor, Heroe):-
-    esAntecesorAux(Antecesor, Heroe, []).
-
-esAntecesorAux(Antecesor, Heroe, Visitados):-
-    not(member(Antecesor, Visitados)),
-    inspiro(Antecesor, Heroe).
-
-esAntecesorAux(Antecesor, Heroe, Visitados):-
-    not(member(Antecesor, Visitados)),
-    inspiro(Antecesor, Intermedio),
-    esAntecesorAux(Intermedio, Heroe, [Antecesor|Visitados]).
+antecesor(Antecesor, Heroe):-
+    cadenaInspiracion(Antecesor, Cadena),
+    append(Antecesores, [Heroe | _], Cadena),
+    member(Antecesor, Antecesores).
 
 antecesoresDe(Heroe, Antecesores):-
-    findall(Antecesor, esAntecesor(Antecesor, Heroe), Antecesores).
+    findall(Antecesor, antecesor(Antecesor, Heroe), ListaAntecesores).
 
 subconjunto([], []).
 
@@ -236,8 +229,6 @@ equipoDeLosSuenios(Heroe, Equipo):-
     AntecesoresElegidos \= [],
     append(AntecesoresElegidos, [Heroe], Integrantes),
     permutation(Integrantes, Equipo).
-
-
 
 %!Tests
 :- begin_tests(habitantes).

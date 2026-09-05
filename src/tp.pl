@@ -184,24 +184,29 @@ sinPrecedentes(Pueblo, Anio):-
 
 %!Punto 5
 %A
-esHeroe(Persona):-
+esHeroe(Persona):-  %cualquier hazania
     conoce(_, hazania(_, Heroes, _), _, _),      %conoce(Persona,hazania(nombreHazania, [personas], lugar), AnioConocimiento, MedioDeConocimiento)
-    member(Persona, Heroes). 
+    member(Persona, Heroes). %persona es algunos que haya participado de la lista de heroe
+
 %B
 inspiro(Inspirador, Heroe):-
+                            %heroe que acompaniaron
     conoce(Heroe, hazania(_, Heroes, _), _, _),  %conoce(Persona,hazania(nombreHazania, [personas], lugar), AnioConocimiento, MedioDeConocimiento)
-    member(Inspirador, Heroes),
+    member(Inspirador, Heroes),%son aquellos que participaron en las hazañas que el héroe conoció.
     Inspirador \= Heroe.
 %C
 cadenaInspiracion(Inicio, Cadena):-
-    cadenaInspiracionAux(Inicio, [], Cadena).
+    cadenaInspiracionAux(Inicio, [], Cadena),
+    length(Cadena, Largo),
+    Largo >= 2,
+    forall(member(Persona, Cadena), esHeroe(Persona)).
 
-cadenaInspiracionAux(Heroe, Visitados, [Heroe]):-
+cadenaInspiracionAux(Heroe, Visitados, [Heroe]):- %la cadena [Heroe] (solo él, sin nadie más) es una cadena válida
     not(member(Heroe, Visitados)).
 
 cadenaInspiracionAux(Heroe, Visitados, [Heroe|Resto]):-
-    not(member(Heroe, Visitados)),
-    inspiro(Heroe, Siguiente),
+    not(member(Heroe, Visitados)),%si heroe principal ya esta en la cadena(si esta, corta la recursion)
+    inspiro(Heroe, Siguiente),%siguiente quienes inspiraron
     cadenaInspiracionAux(Siguiente, [Heroe|Visitados], Resto).
 
 %!Punto 6
@@ -211,7 +216,7 @@ antecesor(Antecesor, Heroe):-
     member(Antecesor, Antecesores).
 
 antecesoresDe(Heroe, Antecesores):-
-    findall(Antecesor, antecesor(Antecesor, Heroe), ListaAntecesores).
+    findall(Antecesor, antecesor(Antecesor, Heroe), Antecesores).
 
 subconjunto([], []).
 
